@@ -23,11 +23,13 @@ enum Payload {
 ```
 
 ## Draggables
-This crate offers the `drag` helper function. You provide it three things: A reference to the drag and drop state, a payload, and the visual elements of the draggable.
+This crate offers the `drag` helper function. You provide it three things: An id, a reference to the drag and drop state, and the visual elements of the draggable. You give it a payload after creating it.
 
 ```rust
-let zone = drag(&state.dragndrop, Payload::Blue, "Drag Me!");
+let zone = drag("an_id", &state.dragndrop, "Drag Me!").payload(Payload::Blue);
 ```
+
+The id is important, because it's how iced can know that two draggables are truly different ones.
 
 ## Drop Zones
 The `drop_zone` helper function creates drop zones. You provide it two things: A reference to the drag and drop state, and the visual elements of the drop zone.
