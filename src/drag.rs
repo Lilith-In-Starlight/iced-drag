@@ -9,7 +9,7 @@ use iced::{Rectangle, Vector};
 use crate::DragAndDrop;
 
 /// A helper for creating Draggables. Needs the drag and drop state, a payload, and inner content.
-#[must_use = "This Element is being created but is not used anywhere. Make sure it is retuned by your view function"]
+#[must_use = "This Element is being created but is not used anywhere. Make sure it has a payload"]
 pub fn drag<'a, Message, Theme, Renderer, Payload>(
     id: String,
     dragging: &'a DragAndDrop,
@@ -59,10 +59,18 @@ impl<Message: Clone, Theme, Renderer: iced::advanced::Renderer, Payload: Clone>
     Draggable<'_, Message, Theme, Renderer, Payload>
 {
     /// Send a message when object begins being dragged.
-    #[must_use = "This Element is being created but is not used anywhere. Make sure it is retuned by your view function"]
+    #[must_use = "This Element is being created but is not used anywhere"]
     pub fn on_pickup<F: (Fn(Payload) -> Message) + 'static>(self, fun: F) -> Self {
         Self {
             on_pickup: Some(Box::new(fun)),
+            ..self
+        }
+    }
+
+    #[must_use = "This draggable is given a payload but is not used anywhere"]
+    pub fn payload(self, payload: Payload) -> Self {
+        Self {
+            payload: Some(payload),
             ..self
         }
     }
@@ -141,19 +149,22 @@ impl<Message: Clone, Theme, Renderer: iced::advanced::Renderer, Payload: Clone +
         cursor: iced::advanced::mouse::Cursor,
         viewport: &iced::Rectangle,
     ) {
+        let state = tree.state.downcast_ref::<State>();
         let content_layout = layout.children().next().unwrap();
 
-        self.content.as_widget().draw(
-            &tree.children[0],
-            renderer,
-            theme,
-            &renderer::Style {
-                text_color: style.text_color,
-            },
-            content_layout,
-            cursor,
-            viewport,
-        );
+        if state.dragging {
+            self.content.as_widget().draw(
+                &tree.children[0],
+                renderer,
+                theme,
+                &renderer::Style {
+                    text_color: style.text_color,
+                },
+                content_layout,
+                cursor,
+                viewport,
+            );
+        }
     }
 
     fn update(
