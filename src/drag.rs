@@ -216,7 +216,9 @@ impl<Message: Clone, Theme, Renderer: iced::advanced::Renderer, Payload: Clone +
                 if state.is_pressed && (cursor.is_over(bounds) || state.dragging) {
                     if !state.dragging {
                         state.dragging = true;
-                        self.dragging.set_to(self.payload.clone());
+                        if let Some(payload) = &self.payload {
+                            self.dragging.set_to(payload.clone());
+                        }
                         if let (Some(on_pickup), Some(payload)) = (&self.on_pickup, &self.payload) {
                             shell.publish(on_pickup(payload.clone()));
                         }
