@@ -11,6 +11,7 @@ use crate::DragAndDrop;
 /// A helper for creating Draggables. Needs the drag and drop state, a payload, and inner content.
 #[must_use = "This Element is being created but is not used anywhere. Make sure it is retuned by your view function"]
 pub fn drag<'a, Message, Theme, Renderer, Payload>(
+    id: String,
     dragging: &'a DragAndDrop,
     payload: Payload,
     content: impl Into<Element<'a, Message, Theme, Renderer>>,
@@ -25,11 +26,13 @@ where
         content: content.into(),
         on_pickup: None,
         payload,
+        id,
     }
 }
 
 /// An Element that can be dragged across the screen.
 pub struct Draggable<'a, Message: Clone, Theme, Renderer, Payload> {
+    pub id: String,
     /// A reference to the global drag and drop state
     pub dragging: &'a DragAndDrop,
     /// The visual elements of the draggable
@@ -80,9 +83,11 @@ impl<Message: Clone, Theme, Renderer: iced::advanced::Renderer, Payload: Clone +
         vec![advanced::widget::Tree::new(&self.content)]
     }
 
-    #[allow(clippy::semicolon_if_nothing_returned)]
     fn diff(&self, tree: &mut iced::advanced::widget::Tree) {
-        tree.diff_children(std::slice::from_ref(&self.content))
+        let state = tree.state.downcast_mut::<State>();
+        if state.prev_id != self.id {
+            *state = State::default();
+        }
     }
 
     fn tag(&self) -> iced::advanced::widget::tree::Tag {
@@ -227,6 +232,7 @@ struct State {
     is_pressed: bool,
     dragging: bool,
     overlay_bounds: Rectangle,
+    prev_id: String,
 }
 struct Overlay<'a, 'b, Message, Theme, Renderer>
 where
