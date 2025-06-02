@@ -13,7 +13,6 @@ use crate::DragAndDrop;
 pub fn drag<'a, Message, Theme, Renderer, Payload>(
     id: String,
     dragging: &'a DragAndDrop,
-    payload: Payload,
     content: impl Into<Element<'a, Message, Theme, Renderer>>,
 ) -> Draggable<'a, Message, Theme, Renderer, Payload>
 where
@@ -25,7 +24,7 @@ where
         dragging,
         content: content.into(),
         on_pickup: None,
-        payload,
+        payload: None,
         id,
     }
 }
@@ -40,7 +39,7 @@ pub struct Draggable<'a, Message: Clone, Theme, Renderer, Payload> {
     /// Send a message on pick up?
     pub on_pickup: Option<Box<dyn Fn(Payload) -> Message>>,
     /// The payload of the draggable. This is intermediary data used by drop zones and messages to modify your program's state.
-    pub payload: Payload,
+    pub payload: Option<Payload>,
 }
 
 impl<
@@ -207,8 +206,8 @@ impl<Message: Clone, Theme, Renderer: iced::advanced::Renderer, Payload: Clone +
                     if !state.dragging {
                         state.dragging = true;
                         self.dragging.set_to(self.payload.clone());
-                        if let Some(on_pickup) = &self.on_pickup {
-                            shell.publish(on_pickup(self.payload.clone()));
+                        if let (Some(on_pickup), Some(payload)) = (&self.on_pickup, &self.payload) {
+                            shell.publish(on_pickup(payload.clone()));
                         }
                     }
 
