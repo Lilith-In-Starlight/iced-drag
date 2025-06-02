@@ -1,0 +1,11 @@
+[package]
+name = "iced-drag"
+description = "A completely backwards drag and drop system for iced."
+license = "MIT"
+version = "0.1.0"
+edition = "2024"
+authors = ["Ivy <katie-and@ampersandia.net>"]
+readme = "README.md"
+
+[dependencies]
+iced = { git = "https://github.com/iced-rs/iced.git", branch = "master", features = ["advanced", "image", "tokio"] }
