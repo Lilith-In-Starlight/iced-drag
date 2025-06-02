@@ -1,3 +1,5 @@
+//! The `DropZone` type and everything needed by it.
+
 use iced::advanced::widget::Tree;
 use iced::advanced::{self, Layout, Widget, layout, mouse, overlay, renderer};
 use iced::mouse::Button;
@@ -5,7 +7,8 @@ use iced::{Element, Length, Padding, Rectangle, Size, Vector};
 
 use crate::DragAndDrop;
 
-#[must_use = "This Element is being created but is not used anywhere. Make sure it is retuned by your view function"]
+/// A helper for creating `DropZones`. Needs the drag and drop state as well as inner content. Make sure to give it an `on_drop` message.
+#[must_use = "This zone is not used anywhere. Make sure to give it an `on_drop` message."]
 pub fn drop_zone<'a, Payload, Message, Theme, Renderer>(
     dragging: &'a DragAndDrop,
     content: impl Into<Element<'a, Message, Theme, Renderer>>,
@@ -28,7 +31,7 @@ where
 pub struct DropZone<
     'a,
     Message: Clone,
-    Payload: Clone,
+    Payload: Clone = (),
     Theme = iced::widget::Theme,
     Renderer = iced::widget::Renderer,
 > {
@@ -36,14 +39,17 @@ pub struct DropZone<
     pub height: Length,
     pub padding: Padding,
     pub content: Element<'a, Message, Theme, Renderer>,
+    /// Send a message when something is dropped?
     pub on_drop: Option<OnDrop<'a, Message, Payload>>,
+    /// The global drag and drop system
     pub dragging: &'a DragAndDrop,
 }
 
 impl<'a, Message: Clone, Theme, Renderer, Payload: Clone>
     DropZone<'a, Message, Payload, Theme, Renderer>
 {
-    #[must_use = "This Element is being created but is not used anywhere. Make sure it is retuned by your view function"]
+    /// Sends a message when something is dropped in this zone.
+    #[must_use = "This Element is not used anywhere. Make sure it is retuned by your view function in some container."]
     pub fn on_drop(self, fun: impl Fn(Payload) -> Message + 'a) -> Self {
         Self {
             on_drop: Some(OnDrop::Closure(Box::new(fun))),

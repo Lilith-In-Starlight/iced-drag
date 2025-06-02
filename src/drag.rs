@@ -1,3 +1,5 @@
+//! The `Draggable` type and everything needed by it.
+
 use iced::advanced::widget::Tree;
 use iced::advanced::{self, Layout, Widget, layout, mouse, overlay, renderer};
 use iced::mouse::Button;
@@ -6,6 +8,7 @@ use iced::{Rectangle, Vector};
 
 use crate::DragAndDrop;
 
+/// A helper for creating Draggables. Needs the drag and drop state, a payload, and inner content.
 #[must_use = "This Element is being created but is not used anywhere. Make sure it is retuned by your view function"]
 pub fn drag<'a, Message, Theme, Renderer, Payload>(
     dragging: &'a DragAndDrop,
@@ -25,10 +28,15 @@ where
     }
 }
 
+/// An Element that can be dragged across the screen.
 pub struct Draggable<'a, Message: Clone, Theme, Renderer, Payload> {
+    /// A reference to the global drag and drop state
     pub dragging: &'a DragAndDrop,
+    /// The visual elements of the draggable
     pub content: Element<'a, Message, Theme, Renderer>,
+    /// Send a message on pick up?
     pub on_pickup: Option<Box<dyn Fn(Payload) -> Message>>,
+    /// The payload of the draggable. This is intermediary data used by drop zones and messages to modify your program's state.
     pub payload: Payload,
 }
 
@@ -48,6 +56,7 @@ impl<
 impl<Message: Clone, Theme, Renderer: iced::advanced::Renderer, Payload: Clone>
     Draggable<'_, Message, Theme, Renderer, Payload>
 {
+    /// Send a message when object begins being dragged.
     #[must_use = "This Element is being created but is not used anywhere. Make sure it is retuned by your view function"]
     pub fn on_pickup<F: (Fn(Payload) -> Message) + 'static>(self, fun: F) -> Self {
         Self {
