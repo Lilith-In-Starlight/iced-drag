@@ -152,7 +152,7 @@ impl<Message: Clone, Theme, Renderer: iced::advanced::Renderer, Payload: Clone +
         let state = tree.state.downcast_ref::<State>();
         let content_layout = layout.children().next().unwrap();
 
-        if state.dragging {
+        if !state.dragging {
             self.content.as_widget().draw(
                 &tree.children[0],
                 renderer,
